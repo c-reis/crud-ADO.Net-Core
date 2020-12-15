@@ -66,7 +66,7 @@ namespace crud_cadastro.Data
         {
             List<ProdutosModel> busca = new List<ProdutosModel>();
 
-            var cmd = new NpgsqlCommand(@"SELECT produto_id, descricao, preco, quantidade FROM produtos", Connection);
+            var cmd = new NpgsqlCommand(@"SELECT produtos_id, descricao, preco, quantidade FROM produtos", Connection);
 
             Connection.Open();
             var reader = cmd.ExecuteReader();
@@ -74,7 +74,7 @@ namespace crud_cadastro.Data
             {
                 busca.Add(new ProdutosModel()
                 {
-                    Produtos_id = reader.GetGuid("produto_id"),
+                    Produtos_id = reader.GetGuid("produtos_id"),
                     Descricao = reader.GetString("descricao"),
                     Preco = reader.GetDouble("preco"),
                     Quantidade = reader.GetInt32("quantidade")

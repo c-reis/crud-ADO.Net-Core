@@ -10,7 +10,7 @@ namespace crud_cadastro.Model
     {
         public Guid Produtos_id { get; set; }
         public string Descricao { get; set; }
-        [Range(0,00000.00)]
+        [Range(0,99999.99)]
         public double Preco { get; set; }
         public int Quantidade { get; set; }
     }

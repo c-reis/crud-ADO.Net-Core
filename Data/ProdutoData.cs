@@ -35,9 +35,10 @@ namespace crud_cadastro.Data
             Connection.Close();
         }
 
-        public void Update (ProdutosModel produtos)
+        public ProdutosModel Update (ProdutosModel produtos)
         {
-            var cmd = new NpgsqlCommand("UPDATE produtos SET descricao = @vDescricao, preco = @vPreco, quantidade = @vQuantidade WHERE produtos_id = @vProdutos_id", Connection);
+            ProdutosModel retorno = null;
+            var cmd = new NpgsqlCommand("UPDATE produtos SET descricao = @vDescricao, preco = @vPreco, quantidade = @vQuantidade WHERE produtos_id = @vProdutos_id RETURNING *", Connection);
 
             cmd.Parameters.AddWithValue("vDescricao", produtos.Descricao);
             cmd.Parameters.AddWithValue("vPreco", produtos.Preco);
@@ -46,8 +47,19 @@ namespace crud_cadastro.Data
 
             Connection.Open();
             cmd.Prepare();
-            cmd.ExecuteNonQuery();
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                retorno = new ProdutosModel()
+                {
+                    Produtos_id = reader.GetGuid("produtos_id"),
+                    Descricao = reader.GetString("descricao"),
+                    Preco = reader.GetDouble("preco"),
+                    Quantidade = reader.GetInt32("quantidade")
+                };
+            }
             Connection.Close();
+            return retorno;
         }
 
         public void Delete (Guid produto_id)
@@ -69,6 +81,7 @@ namespace crud_cadastro.Data
             var cmd = new NpgsqlCommand(@"SELECT produtos_id, descricao, preco, quantidade FROM produtos", Connection);
 
             Connection.Open();
+            cmd.Prepare();
             var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -92,6 +105,7 @@ namespace crud_cadastro.Data
             cmd.Parameters.AddWithValue("vProdutos_id", produto_id);
 
             Connection.Open();
+            cmd.Prepare();
             var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -103,6 +117,32 @@ namespace crud_cadastro.Data
                     Quantidade = reader.GetInt32("quantidade")
                 };
             }
+            Connection.Close();
+
+            return busca;
+        }
+
+        public List<ProdutosModel> SearchByWords(string words)
+        {
+            List<ProdutosModel> busca = new List<ProdutosModel>();
+
+            var cmd = new NpgsqlCommand(@"SELECT produtos_id, descricao, preco, quantidade FROM produtos WHERE descricao LIKE '%' || @vWords ||'%'", Connection);
+            cmd.Parameters.AddWithValue("@vWords", words);
+
+            Connection.Open();
+            cmd.Prepare();
+            var reader = cmd.ExecuteReader();
+            while(reader.Read())
+            {
+                busca.Add(new ProdutosModel()
+                {
+                    Produtos_id = reader.GetGuid("produtos_id"),
+                    Descricao = reader.GetString("descricao"),
+                    Preco = reader.GetDouble("preco"),
+                    Quantidade = reader.GetInt32("quantidade")
+                });
+            }
+
             Connection.Close();
 
             return busca;

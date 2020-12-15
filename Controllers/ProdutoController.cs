@@ -33,8 +33,8 @@ namespace crud_cadastro.Controllers
         [Route("Update")]
         public ActionResult Update(ProdutosModel produto)
         {
-            ProdutoData.Update(produto);
-            return Ok(produto);
+            var retorno = ProdutoData.Update(produto);
+            return Ok(retorno);
         }
 
         [HttpDelete]
@@ -49,16 +49,24 @@ namespace crud_cadastro.Controllers
         [Route("Search")]
         public ActionResult Search()
         {
-            var busca = ProdutoData.Seach();
-            return Ok(busca);
+            var search = ProdutoData.Seach();
+            return Ok(search);
         }
 
         [HttpGet]
         [Route("SearchById")]
         public ActionResult SearchById(Guid produto_id)
         {
-            var busca = ProdutoData.SearchById(produto_id);
-            return Ok(busca);
+            var searchById = ProdutoData.SearchById(produto_id);
+            return Ok(searchById);
+        }
+
+        [HttpGet]
+        [Route("SearchByWords")]
+        public ActionResult SearchByWords(string words)
+        {
+            var searchByWords = ProdutoData.SearchByWords(words);
+            return Ok(searchByWords);
         }
     }
 }
